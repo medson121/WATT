@@ -21,6 +21,13 @@ project.xcworkspace/xcuserdata/
 .build/
 .swiftpm/
 
+# Secrets, Keys & Environment
+*.p8
+*.pem
+*.key
+*.mobileprovision
+.env*
+
 # Operating System
 .DS_Store
 Thumbs.db
