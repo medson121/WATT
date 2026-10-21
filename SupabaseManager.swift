@@ -217,4 +217,40 @@ public class SupabaseManager: ObservableObject {
             return CountryPrice.all // fallback para dados mock
         }
     }
+    
+    // MARK: - Excluir todos os dados do dispositivo (GDPR / LGPD Right to be Forgotten)
+    public func purgeDeviceData() async -> Bool {
+        AppLogger.info("Iniciando purga de dados para deviceUUID: \(deviceUUID)")
+        
+        let endpoints = [
+            "\(restBaseURL)/daily_checks?device_id=eq.\(deviceUUID)",
+            "\(restBaseURL)/user_vampires?device_id=eq.\(deviceUUID)"
+        ]
+        
+        var allSucceeded = true
+        for endpoint in endpoints {
+            guard let url = URL(string: endpoint) else { continue }
+            var request = URLRequest(url: url)
+            request.httpMethod = "DELETE"
+            request.setValue(supabaseAnonKey, forHTTPHeaderField: "apikey")
+            request.setValue("Bearer \(supabaseAnonKey)", forHTTPHeaderField: "Authorization")
+            request.setValue(deviceUUID, forHTTPHeaderField: "X-Device-ID")
+            request.timeoutInterval = 10
+            
+            do {
+                let (_, response) = try await URLSession.shared.data(for: request)
+                if let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) {
+                    AppLogger.success("Dados purgados com sucesso de: \(endpoint)")
+                } else {
+                    allSucceeded = false
+                }
+            } catch {
+                AppLogger.error("Falha ao purgar dados: \(error.localizedDescription)")
+                allSucceeded = false
+            }
+        }
+        
+        return allSucceeded
+    }
 }
+

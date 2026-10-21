@@ -12,6 +12,7 @@ struct DashboardView: View {
     
     var onNavigateToVampires: (() -> Void)? = nil
     @State private var navigateToVampires = false
+    @State private var showPrivacySettings = false
     
     // Mock data - depois vem do Supabase daily_checks
     @State var totalEurosSaved: Double = 12.40
@@ -184,6 +185,25 @@ struct DashboardView: View {
         }
         .sheet(isPresented: $paywall.showPaywall) {
             PaywallView()
+        }
+        .sheet(isPresented: $showPrivacySettings) {
+            PrivacySettingsView()
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showPrivacySettings = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "shield.lefthalf.filled.badge.checkmark")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(Color(hex: "#059669"))
+                    }
+                    .padding(6)
+                    .background(Color(hex: "#10B981").opacity(0.12))
+                    .clipShape(Circle())
+                }
+            }
         }
         .task {
             // Busca dados reais do Supabase quando conecta

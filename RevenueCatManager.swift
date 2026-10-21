@@ -160,6 +160,37 @@ class PaywallManager: ObservableObject {
         UserDefaults.standard.removeObject(forKey: "watt_has_completed_first_fix")
         AppLogger.info("Estado de teste resetado")
     }
+    
+    // MARK: - Excluir todos os dados (Conformidade Apple Guideline 5.1.1(v) & GDPR / LGPD)
+    @MainActor
+    public func resetAllDataGDPR() async {
+        AppLogger.info("Iniciando exclusão total de dados do usuário (GDPR / LGPD)...")
+        
+        // 1. Purgar dados na nuvem Supabase
+        _ = await SupabaseManager.shared.purgeDeviceData()
+        
+        // 2. Limpar biometria
+        BiometricAuthManager.shared.resetBiometrics()
+        
+        // 3. Limpar chaves sensíveis do Keychain
+        KeychainHelper.delete(key: "watt_is_pro")
+        KeychainHelper.delete(key: "watt_device_uuid")
+        KeychainHelper.delete(key: "watt_biometric_enabled")
+        
+        // 4. Limpar preferências locais de consumo e fixações
+        let domain = Bundle.main.bundleIdentifier ?? "com.example.WATT"
+        UserDefaults.standard.removePersistentDomain(forName: domain)
+        UserDefaults.standard.synchronize()
+        
+        // 5. Resetar estados reativos para reiniciar fluxo do app
+        self.isPro = false
+        self.hasCompletedFirstFix = false
+        self.showPaywall = false
+        self.selectedTab = .home
+        self.navigateToDashboard = false
+        
+        AppLogger.success("Todos os dados locais e remotos foram apagados com sucesso.")
+    }
 }
 
 // MARK: - Typealias de conveniência para RevenueCatManager
