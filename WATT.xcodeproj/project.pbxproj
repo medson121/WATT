@@ -16,6 +16,7 @@
 		1A0000272A00002700000027 /* QuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000172A00001700000017 /* QuizView.swift */; };
 		1A0000282A00002800000028 /* VampireListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000182A00001800000018 /* VampireListView.swift */; };
 		1A0000292A00002900000029 /* FixAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000192A00001900000019 /* FixAnimationView.swift */; };
+		1A00002A2A00002A0000002A /* SavingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A00001A2A00001A0000001A /* SavingsViewModel.swift */; };
 		1A0000232A00002300000023 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A0000132A00001300000013 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +31,7 @@
 		1A0000172A00001700000017 /* QuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizView.swift; sourceTree = "<group>"; };
 		1A0000182A00001800000018 /* VampireListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VampireListView.swift; sourceTree = "<group>"; };
 		1A0000192A00001900000019 /* FixAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixAnimationView.swift; sourceTree = "<group>"; };
+		1A00001A2A00001A0000001A /* SavingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsViewModel.swift; sourceTree = "<group>"; };
 		1A0000132A00001300000013 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -56,6 +58,7 @@
 				1A0000172A00001700000017 /* QuizView.swift */,
 				1A0000182A00001800000018 /* VampireListView.swift */,
 				1A0000192A00001900000019 /* FixAnimationView.swift */,
+				1A00001A2A00001A0000001A /* SavingsViewModel.swift */,
 				1A0000132A00001300000013 /* Assets.xcassets */,
 				1A0000042A00000400000004 /* WATT.app */,
 			);
@@ -139,6 +142,7 @@
 				1A0000272A00002700000027 /* QuizView.swift in Sources */,
 				1A0000282A00002800000028 /* VampireListView.swift in Sources */,
 				1A0000292A00002900000029 /* FixAnimationView.swift in Sources */,
+				1A00002A2A00002A0000002A /* SavingsViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -80,34 +80,29 @@ struct VampireDevice: Identifiable, Equatable {
 
 // MARK: - 2. TELA PRINCIPAL: VampireListView
 struct VampireListView: View {
-    @State private var devices: [VampireDevice]
-    let country: CountryPrice
+    @StateObject private var viewModel: SavingsViewModel
     @State private var deviceToFix: VampireDevice? = nil
     @State private var showPaywall: Bool = false
     @State private var auditPulsing: Bool = false
 
     init(devices: [VampireDevice] = VampireDevice.defaultDevices, country: CountryPrice = .germany) {
-        _devices = State(initialValue: devices)
-        self.country = country
+        _viewModel = StateObject(wrappedValue: SavingsViewModel(devices: devices, country: country))
     }
 
-    // Total yearly cost remaining
     var totalLeaking: Double {
-        devices.filter { !$0.isFixed }.reduce(0.0) { $0 + $1.yearlyCost }
+        viewModel.liveTotalLeaking
     }
 
-    // Number of active vs fixed
     var activeCount: Int {
-        devices.filter { !$0.isFixed }.count
+        viewModel.activeCount
     }
 
     var fixedCount: Int {
-        devices.filter { $0.isFixed }.count
+        viewModel.fixedCount
     }
 
-    // Savings that could be unlocked with Pro
     var remainingPotentialSavings: Double {
-        totalLeaking
+        viewModel.remainingPotentialSavings
     }
 
     var body: some View {
@@ -187,7 +182,7 @@ struct VampireListView: View {
                 // MARK: - Lista de Cards em Glassmorphism
                 ScrollView(showsIndicators: false) {
                     LazyVStack(spacing: 14) {
-                        ForEach(devices) { device in
+                        ForEach(viewModel.devices) { device in
                             VampireCardView(device: device) {
                                 triggerTapHaptic()
                                 if fixedCount == 0 {
@@ -286,12 +281,9 @@ struct VampireListView: View {
                     yearlyCost: device.yearlyCost,
                     dailySavingsFormatted: device.dailySavingsFormatted,
                     onComplete: {
-                        withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) {
-                            if let index = devices.firstIndex(where: { $0.id == device.id }) {
-                                devices[index].isFixed = true
-                            }
-                            deviceToFix = nil
-                        }
+                        viewModel.fixVampire(device)
+                        deviceToFix = nil
+
                         // After first FIX, show paywall trigger!
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                             showPaywall = true
