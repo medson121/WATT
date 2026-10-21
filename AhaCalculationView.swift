@@ -101,6 +101,9 @@ struct ConfettiShowerView: View {
 struct AhaCalculationView: View {
     let totalWatts: Double
     let country: CountryPrice
+    var onFixFirstVampire: (() -> Void)? = nil
+
+    @State private var navigateToVampireList: Bool = false
 
     // MARK: - 2. FÓRMULAS MATEMÁTICAS & CÁLCULOS
     var kwhPerYear: Double {
@@ -302,6 +305,11 @@ struct AhaCalculationView: View {
                     VStack(spacing: 12) {
                         Button(action: {
                             triggerHapticFeedback()
+                            if let onFix = onFixFirstVampire {
+                                onFix()
+                            } else {
+                                navigateToVampireList = true
+                            }
                         }) {
                             HStack(spacing: 10) {
                                 Text("Fix my first vampire for free")
@@ -343,6 +351,9 @@ struct AhaCalculationView: View {
                     .padding(.bottom, 24)
                 }
             }
+        }
+        .navigationDestination(isPresented: $navigateToVampireList) {
+            VampireListView()
         }
         .onAppear {
             startAnimationChoreography()
