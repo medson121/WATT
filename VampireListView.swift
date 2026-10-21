@@ -83,6 +83,7 @@ struct VampireListView: View {
     @StateObject private var viewModel: SavingsViewModel
     @State private var deviceToFix: VampireDevice? = nil
     @State private var showPaywall: Bool = false
+    @State private var showSupabaseTest: Bool = false
     @State private var auditPulsing: Bool = false
 
     init(devices: [VampireDevice] = VampireDevice.defaultDevices, country: CountryPrice = .germany) {
@@ -133,24 +134,46 @@ struct VampireListView: View {
             VStack(spacing: 0) {
                 // MARK: - Header Fixo Superior
                 VStack(spacing: 12) {
-                    // LIVE AUDIT Pulse Badge
-                    HStack(spacing: 8) {
-                        Circle()
-                            .fill(activeCount > 0 ? Color(hex: "EF4444") : Color(hex: "10B981"))
-                            .frame(width: 8, height: 8)
-                            .scaleEffect(auditPulsing ? 1.35 : 0.85)
-                            .opacity(auditPulsing ? 1.0 : 0.4)
+                    // Header Top Row: LIVE AUDIT Badge + Supabase Cloud Status
+                    HStack {
+                        HStack(spacing: 8) {
+                            Circle()
+                                .fill(activeCount > 0 ? Color(hex: "EF4444") : Color(hex: "10B981"))
+                                .frame(width: 8, height: 8)
+                                .scaleEffect(auditPulsing ? 1.35 : 0.85)
+                                .opacity(auditPulsing ? 1.0 : 0.4)
 
-                        Text(activeCount > 0 ? "LIVE AUDIT • LEAKS ACTIVE" : "AUDIT COMPLETE • PROTECTED")
-                            .font(.system(size: 11, weight: .bold, design: .rounded))
-                            .foregroundColor(activeCount > 0 ? Color(hex: "B91C1C") : Color(hex: "065F46"))
+                            Text(activeCount > 0 ? "LIVE AUDIT • LEAKS ACTIVE" : "AUDIT COMPLETE • PROTECTED")
+                                .font(.system(size: 11, weight: .bold, design: .rounded))
+                                .foregroundColor(activeCount > 0 ? Color(hex: "B91C1C") : Color(hex: "065F46"))
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(activeCount > 0 ? Color(hex: "FEE2E2") : Color(hex: "D1FAE5"))
+                        )
+
+                        Spacer()
+
+                        Button {
+                            showSupabaseTest = true
+                        } label: {
+                            HStack(spacing: 5) {
+                                Image(systemName: "externaldrive.badge.icloud")
+                                    .font(.system(size: 12, weight: .semibold))
+                                Text("DB")
+                                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                            }
+                            .foregroundColor(Color(hex: "059669"))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(Color(hex: "D1FAE5"))
+                            )
+                        }
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        Capsule()
-                            .fill(activeCount > 0 ? Color(hex: "FEE2E2") : Color(hex: "D1FAE5"))
-                    )
 
                     // Dynamic Title
                     Text(activeCount == 0 ? "All vampires eliminated! 🎉" : "Found \(activeCount) vampires leaking €\(String(format: "%.0f", totalLeaking))/year")
@@ -303,6 +326,9 @@ struct VampireListView: View {
             PaywallModalSheet(remainingSavings: remainingPotentialSavings)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showSupabaseTest) {
+            SupabaseTestView()
         }
     }
 

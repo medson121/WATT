@@ -10,8 +10,10 @@ struct CountryPrice: Identifiable, Equatable, Hashable, Codable {
 
     enum CodingKeys: String, CodingKey {
         case id
+        case code
         case name
         case flag
+        case currency
         case currencySymbol = "currency_symbol"
         case pricePerKWh = "price_per_kwh"
     }
@@ -26,10 +28,31 @@ struct CountryPrice: Identifiable, Equatable, Hashable, Codable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.id = try container.decode(String.self, forKey: .id)
+        if let idVal = try? container.decode(String.self, forKey: .id) {
+            self.id = idVal
+        } else if let codeVal = try? container.decode(String.self, forKey: .code) {
+            self.id = codeVal
+        } else {
+            self.id = UUID().uuidString
+        }
         self.name = try container.decode(String.self, forKey: .name)
         self.flag = (try? container.decode(String.self, forKey: .flag)) ?? "🌍"
-        self.currencySymbol = (try? container.decode(String.self, forKey: .currencySymbol)) ?? "€"
+        
+        if let sym = try? container.decode(String.self, forKey: .currencySymbol) {
+            self.currencySymbol = sym
+        } else if let curr = try? container.decode(String.self, forKey: .currency) {
+            switch curr.uppercased() {
+            case "EUR": self.currencySymbol = "€"
+            case "GBP": self.currencySymbol = "£"
+            case "DKK": self.currencySymbol = "kr"
+            case "CHF": self.currencySymbol = "CHF"
+            case "USD": self.currencySymbol = "$"
+            case "BRL": self.currencySymbol = "R$"
+            default: self.currencySymbol = curr
+            }
+        } else {
+            self.currencySymbol = "€"
+        }
         self.pricePerKWh = try container.decode(Double.self, forKey: .pricePerKWh)
     }
 
