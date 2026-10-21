@@ -78,8 +78,11 @@ struct PaywallView: View {
                         Button {
                             Task {
                                 isPurchasing = true
-                                _ = await paywall.purchase()
+                                let success = await paywall.purchase()
                                 isPurchasing = false
+                                if success {
+                                    dismiss()
+                                }
                             }
                         } label: {
                             HStack {
@@ -104,7 +107,10 @@ struct PaywallView: View {
                             .foregroundColor(.gray)
                         
                         Button("Restore Purchases") {
-                            Task { await paywall.restore() }
+                            Task {
+                                await paywall.restore()
+                                dismiss()
+                            }
                         }
                         .font(.caption)
                         .foregroundColor(.gray)

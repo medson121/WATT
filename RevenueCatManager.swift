@@ -9,9 +9,26 @@ import SwiftUI
 class PaywallManager: ObservableObject {
     static let shared = PaywallManager()
     
-    @Published var isPro = false
-    @Published var hasCompletedFirstFix = false
+    enum AppTab: Int, Hashable, CaseIterable {
+        case home = 0
+        case vampires = 1
+    }
+    
+    @Published var isPro: Bool {
+        didSet {
+            UserDefaults.standard.set(isPro, forKey: "watt_is_pro")
+        }
+    }
+    
+    @Published var hasCompletedFirstFix: Bool {
+        didSet {
+            UserDefaults.standard.set(hasCompletedFirstFix, forKey: "watt_has_completed_first_fix")
+        }
+    }
+    
     @Published var showPaywall = false
+    @Published var selectedTab: AppTab = .home
+    @Published var navigateToDashboard: Bool = false
     
     // Preços - GDPR friendly, mostra em euro
     struct Plan: Identifiable {
@@ -35,6 +52,12 @@ class PaywallManager: ObservableObject {
         plans.first { $0.id == selectedPlanId } ?? plans[0]
     }
     
+    init() {
+        self.isPro = UserDefaults.standard.bool(forKey: "watt_is_pro")
+        self.hasCompletedFirstFix = UserDefaults.standard.bool(forKey: "watt_has_completed_first_fix")
+        self.selectedPlanId = "watt_yearly_29_99"
+    }
+    
     // MARK: - Lógica $100k: só mostra paywall DEPOIS da primeira vitória
     func triggerPaywallAfterFirstFix() {
         if hasCompletedFirstFix && !isPro {
@@ -47,6 +70,8 @@ class PaywallManager: ObservableObject {
     
     func completeFirstFix() {
         hasCompletedFirstFix = true
+        selectedTab = .home
+        navigateToDashboard = true
         // Salva no Supabase que completou primeira vitória
         Task {
             await SupabaseManager.shared.saveDailyCheck(eurosSaved: 0.38, kwhSaved: 0.15, co2Saved: 0.06, vampiresFixed: 1)
@@ -63,20 +88,33 @@ class PaywallManager: ObservableObject {
         print("🛒 Comprando \(selectedPlan.name) por \(selectedPlan.price)...")
         try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5s loading
         
-        await MainActor.run {
-            self.isPro = true
-            self.showPaywall = false
-        }
+        self.isPro = true
+        self.showPaywall = false
+        self.selectedTab = .home
+        self.navigateToDashboard = true
         
         // Salva que virou Pro no Supabase
-        print("✅ Virou PRO! Plano: \(selectedPlan.name)")
+        print("✅ Virou PRO! Plano: \(selectedPlan.name) - Navegando para DashboardView")
         return true
     }
     
     func restore() async {
         // Mock restore
         print("🔄 Restaurando compras...")
-        await MainActor.run { self.isPro = true }
+        self.isPro = true
+        self.showPaywall = false
+        self.selectedTab = .home
+        self.navigateToDashboard = true
+    }
+    
+    func resetForTesting() {
+        self.isPro = false
+        self.hasCompletedFirstFix = false
+        self.showPaywall = false
+        self.selectedTab = .home
+        self.navigateToDashboard = false
+        UserDefaults.standard.removeObject(forKey: "watt_is_pro")
+        UserDefaults.standard.removeObject(forKey: "watt_has_completed_first_fix")
     }
 }
 
