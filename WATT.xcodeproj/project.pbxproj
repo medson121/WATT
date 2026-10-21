@@ -22,6 +22,9 @@
 		1A00002D2A00002D0000002D /* RevenueCatManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A00001D2A00001D0000001D /* RevenueCatManager.swift */; };
 		1A00002E2A00002E0000002E /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A00001E2A00001E0000001E /* PaywallView.swift */; };
 		1A00002F2A00002F0000002F /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A00001F2A00001F0000001F /* DashboardView.swift */; };
+		1A0000802A00008000000080 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000702A00007000000070 /* KeychainHelper.swift */; };
+		1A0000812A00008100000081 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000712A00007100000071 /* AppLogger.swift */; };
+		1A0000822A00008200000082 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000722A00007200000072 /* AppConfiguration.swift */; };
 		1A0000232A00002300000023 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A0000132A00001300000013 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -42,6 +45,9 @@
 		1A00001D2A00001D0000001D /* RevenueCatManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatManager.swift; sourceTree = "<group>"; };
 		1A00001E2A00001E0000001E /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		1A00001F2A00001F0000001F /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		1A0000702A00007000000070 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		1A0000712A00007100000071 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
+		1A0000722A00007200000072 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		1A0000132A00001300000013 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -74,6 +80,9 @@
 				1A00001D2A00001D0000001D /* RevenueCatManager.swift */,
 				1A00001E2A00001E0000001E /* PaywallView.swift */,
 				1A00001F2A00001F0000001F /* DashboardView.swift */,
+				1A0000702A00007000000070 /* KeychainHelper.swift */,
+				1A0000712A00007100000071 /* AppLogger.swift */,
+				1A0000722A00007200000072 /* AppConfiguration.swift */,
 				1A0000132A00001300000013 /* Assets.xcassets */,
 				1A0000042A00000400000004 /* WATT.app */,
 			);
@@ -163,6 +172,9 @@
 				1A00002D2A00002D0000002D /* RevenueCatManager.swift in Sources */,
 				1A00002E2A00002E0000002E /* PaywallView.swift in Sources */,
 				1A00002F2A00002F0000002F /* DashboardView.swift in Sources */,
+				1A0000802A00008000000080 /* KeychainHelper.swift in Sources */,
+				1A0000812A00008100000081 /* AppLogger.swift in Sources */,
+				1A0000822A00008200000082 /* AppConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

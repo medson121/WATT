@@ -117,8 +117,8 @@ struct PaywallView: View {
                         
                         // Links GDPR obrigatórios
                         HStack(spacing: 16) {
-                            Link("Terms", destination: URL(string: "https://watt.app/terms")!)
-                            Link("Privacy", destination: URL(string: "https://watt.app/privacy")!)
+                            Link("Terms", destination: AppConfiguration.shared.termsURL)
+                            Link("Privacy", destination: AppConfiguration.shared.privacyURL)
                         }
                         .font(.caption2)
                         .foregroundColor(.gray)

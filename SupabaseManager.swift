@@ -1,17 +1,16 @@
-// SupabaseManager.swift - Conecta seu app iOS com o banco que você criou na Parte 1
-// Cole no Antigravity - funciona no Windows!
+// SupabaseManager.swift - Conecta seu app iOS com o banco Supabase com segurança reforçada
+// Protegido contra vazamento de logs, com suporte a RLS via Device UUID e configuração centralizada
 
 import Foundation
 import SwiftUI
 
-// MARK: - Modelo simples (sem SDK externo, usa URLSession - funciona 100% no Windows)
-
+// MARK: - Gerenciador Seguro do Supabase
 public class SupabaseManager: ObservableObject {
     public static let shared = SupabaseManager()
     
-    // Configurações do Supabase fornecidas
-    @Published public private(set) var supabaseURL = "https://qjzdkmyxxhocyqvwqmbi.supabase.co/rest/v1/"
-    @Published public private(set) var supabaseAnonKey = "sb_publishable_9mpwzt_DM90N73wBsD-XEw_PVyVbzuP"
+    // Configurações seguras carregadas via AppConfiguration
+    @Published public private(set) var supabaseURL = AppConfiguration.shared.supabaseURL
+    @Published public private(set) var supabaseAnonKey = AppConfiguration.shared.supabaseAnonKey
     
     @Published public var isConnected = false
     @Published public var isTesting = false
@@ -21,6 +20,11 @@ public class SupabaseManager: ObservableObject {
     @Published public var lastLatencyMs: Int?
     @Published public var lastTestedAt: Date?
     @Published public var fetchedCountries: [CountryPrice] = []
+
+    /// Identificador único e persistente do dispositivo armazenado com segurança no Keychain
+    public var deviceUUID: String {
+        KeychainHelper.getOrCreateDeviceUUID()
+    }
 
     /// Base REST endpoint URL helper to prevent double slashes or missing /rest/v1
     public var restBaseURL: String {
@@ -43,7 +47,7 @@ public class SupabaseManager: ObservableObject {
         self.supabaseAnonKey = anonKey.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
-    // MARK: - Testar conexão com countries_prices (que você já criou)
+    // MARK: - Testar conexão com countries_prices
     @discardableResult
     public func testConnection() async -> Bool {
         await MainActor.run {
@@ -66,6 +70,7 @@ public class SupabaseManager: ObservableObject {
         request.httpMethod = "GET"
         request.setValue(supabaseAnonKey, forHTTPHeaderField: "apikey")
         request.setValue("Bearer \(supabaseAnonKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(deviceUUID, forHTTPHeaderField: "X-Device-ID")
         request.timeoutInterval = 10
         
         do {
@@ -83,15 +88,15 @@ public class SupabaseManager: ObservableObject {
                 }
                 
                 if httpResponse.statusCode == 200 {
-                    print("✅ Supabase conectado com sucesso (\(elapsedMs)ms)! Dados: \(responseString)")
+                    AppLogger.success("Supabase conectado com sucesso (\(elapsedMs)ms)")
                     await MainActor.run {
                         self.isConnected = true
                         self.isTesting = false
                     }
                     return true
                 } else {
-                    let errMsg = "HTTP \(httpResponse.statusCode): \(responseString)"
-                    print("❌ Supabase erro: \(errMsg)")
+                    let errMsg = "HTTP \(httpResponse.statusCode)"
+                    AppLogger.error("Supabase retorno com erro: \(errMsg)")
                     await MainActor.run {
                         self.lastError = errMsg
                         self.isConnected = false
@@ -101,7 +106,7 @@ public class SupabaseManager: ObservableObject {
                 }
             }
         } catch {
-            print("❌ Erro conexão: \(error)")
+            AppLogger.error("Erro na conexão: \(error.localizedDescription)")
             await MainActor.run {
                 self.lastError = error.localizedDescription
                 self.isConnected = false
@@ -111,7 +116,7 @@ public class SupabaseManager: ObservableObject {
         return false
     }
     
-    // MARK: - Salvar vampiro do usuário
+    // MARK: - Salvar vampiro do usuário (associado ao deviceUUID protegido)
     public func saveUserVampire(catalogId: String, customWatts: Double?, room: String) async {
         let urlString = "\(restBaseURL)/user_vampires"
         guard let url = URL(string: urlString) else { return }
@@ -122,9 +127,11 @@ public class SupabaseManager: ObservableObject {
         request.setValue("Bearer \(supabaseAnonKey)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("return=representation", forHTTPHeaderField: "Prefer")
+        request.setValue(deviceUUID, forHTTPHeaderField: "X-Device-ID")
+        request.timeoutInterval = 10
         
-        // Pega user_id do auth (por enquanto usa UUID fake pra testar, depois com login real)
         var body: [String: Any] = [
+            "device_id": deviceUUID,
             "catalog_id": catalogId,
             "room": room,
             "is_fixed": false
@@ -135,14 +142,16 @@ public class SupabaseManager: ObservableObject {
         
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
-            let (data, _) = try await URLSession.shared.data(for: request)
-            print("✅ Vampiro salvo: \(String(data: data, encoding: .utf8) ?? "")")
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) {
+                AppLogger.success("Vampiro registrado com segurança no Supabase")
+            }
         } catch {
-            print("❌ Erro salvar vampiro: \(error)")
+            AppLogger.error("Falha ao salvar vampiro: \(error.localizedDescription)")
         }
     }
     
-    // MARK: - Salvar check diário (quando fixa)
+    // MARK: - Salvar check diário (associado ao deviceUUID protegido)
     public func saveDailyCheck(eurosSaved: Double, kwhSaved: Double, co2Saved: Double, vampiresFixed: Int) async {
         let urlString = "\(restBaseURL)/daily_checks"
         guard let url = URL(string: urlString) else { return }
@@ -152,12 +161,15 @@ public class SupabaseManager: ObservableObject {
         request.setValue(supabaseAnonKey, forHTTPHeaderField: "apikey")
         request.setValue("Bearer \(supabaseAnonKey)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(deviceUUID, forHTTPHeaderField: "X-Device-ID")
+        request.timeoutInterval = 10
         
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         let today = formatter.string(from: Date())
         
         let body: [String: Any] = [
+            "device_id": deviceUUID,
             "date": today,
             "euros_saved": eurosSaved,
             "kwh_saved": kwhSaved,
@@ -168,14 +180,16 @@ public class SupabaseManager: ObservableObject {
         
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
-            let (data, _) = try await URLSession.shared.data(for: request)
-            print("✅ Check diário salvo: \(String(data: data, encoding: .utf8) ?? "")")
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) {
+                AppLogger.success("Check diário persistido com segurança")
+            }
         } catch {
-            print("❌ Erro salvar check: \(error)")
+            AppLogger.error("Falha ao salvar check diário: \(error.localizedDescription)")
         }
     }
     
-    // MARK: - Buscar países (do banco que você criou na Parte 1)
+    // MARK: - Buscar países
     public func fetchCountries() async -> [CountryPrice] {
         let urlString = "\(restBaseURL)/countries_prices?select=*"
         guard let url = URL(string: urlString) else { return CountryPrice.all }
@@ -184,17 +198,22 @@ public class SupabaseManager: ObservableObject {
         request.httpMethod = "GET"
         request.setValue(supabaseAnonKey, forHTTPHeaderField: "apikey")
         request.setValue("Bearer \(supabaseAnonKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(deviceUUID, forHTTPHeaderField: "X-Device-ID")
+        request.timeoutInterval = 10
         
         do {
-            let (data, _) = try await URLSession.shared.data(for: request)
-            let countries = try JSONDecoder().decode([CountryPrice].self, from: data)
-            print("✅ \(countries.count) países buscados do Supabase")
-            await MainActor.run {
-                self.fetchedCountries = countries
+            let (data, response) = try await URLSession.shared.data(for: request)
+            if let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) {
+                let countries = try JSONDecoder().decode([CountryPrice].self, from: data)
+                AppLogger.success("\(countries.count) países carregados do Supabase")
+                await MainActor.run {
+                    self.fetchedCountries = countries
+                }
+                return countries
             }
-            return countries
+            return CountryPrice.all
         } catch {
-            print("❌ Erro buscar países: \(error)")
+            AppLogger.error("Erro ao buscar países: \(error.localizedDescription)")
             return CountryPrice.all // fallback para dados mock
         }
     }

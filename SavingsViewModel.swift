@@ -9,9 +9,9 @@ public struct PostHogAnalytics {
         // PostHog SDK integration when package is imported
         PostHogSDK.shared.capture(event, properties: properties)
         #else
-        // Structured telemetry logging
+        // Structured telemetry logging (silenced in production)
         let propString = properties?.map { "\($0.key): \($0.value)" }.joined(separator: ", ") ?? "none"
-        print("📊 [PostHog Event] '\(event)' -> [\(propString)]")
+        AppLogger.debug("PostHog Event '\(event)' -> [\(propString)]")
         #endif
     }
 }
