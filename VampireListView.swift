@@ -323,9 +323,7 @@ struct VampireListView: View {
             }
         }
         .sheet(isPresented: $showPaywall) {
-            PaywallModalSheet(remainingSavings: remainingPotentialSavings)
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.visible)
+            PaywallView()
         }
         .sheet(isPresented: $showSupabaseTest) {
             SupabaseTestView()
