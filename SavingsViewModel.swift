@@ -93,6 +93,23 @@ final class SavingsViewModel: ObservableObject {
             hasTrackedFirstFix = true
             trackFirstFixCompleted(for: vampire, dailySaved: eurosSavedToday)
         }
+
+        // 4. Persist to Supabase
+        let kwhSavedToday = (vampire.watts * 18.0) / 1000.0
+        let co2SavedToday = kwhSavedToday * 0.40
+        Task {
+            await SupabaseManager.shared.saveDailyCheck(
+                eurosSaved: eurosSavedToday,
+                kwhSaved: kwhSavedToday,
+                co2Saved: co2SavedToday,
+                vampiresFixed: 1
+            )
+            await SupabaseManager.shared.saveUserVampire(
+                catalogId: vampire.id.uuidString,
+                customWatts: vampire.watts,
+                room: vampire.room
+            )
+        }
     }
 
     // MARK: - 3. PostHog Event Tracking

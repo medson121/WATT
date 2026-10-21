@@ -1,12 +1,37 @@
 import Foundation
 
 // MARK: - CountryPrice Model
-struct CountryPrice: Identifiable, Equatable, Hashable {
+struct CountryPrice: Identifiable, Equatable, Hashable, Codable {
     let id: String
     let name: String
     let flag: String
     let currencySymbol: String
     let pricePerKWh: Double
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case flag
+        case currencySymbol = "currency_symbol"
+        case pricePerKWh = "price_per_kwh"
+    }
+
+    init(id: String, name: String, flag: String, currencySymbol: String, pricePerKWh: Double) {
+        self.id = id
+        self.name = name
+        self.flag = flag
+        self.currencySymbol = currencySymbol
+        self.pricePerKWh = pricePerKWh
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(String.self, forKey: .id)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.flag = (try? container.decode(String.self, forKey: .flag)) ?? "🌍"
+        self.currencySymbol = (try? container.decode(String.self, forKey: .currencySymbol)) ?? "€"
+        self.pricePerKWh = try container.decode(Double.self, forKey: .pricePerKWh)
+    }
 
     // MARK: - Required European Presets: DE, IE, BE, DK, UK, NL
     static let germany = CountryPrice(
@@ -78,6 +103,7 @@ struct CountryPrice: Identifiable, Equatable, Hashable {
     ]
 
     static let presets: [CountryPrice] = allCountries
+    static let all: [CountryPrice] = allCountries
 }
 
 // MARK: - PriceData Calculations
