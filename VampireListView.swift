@@ -80,10 +80,16 @@ struct VampireDevice: Identifiable, Equatable {
 
 // MARK: - 2. TELA PRINCIPAL: VampireListView
 struct VampireListView: View {
-    @State private var devices: [VampireDevice] = VampireDevice.defaultDevices
+    @State private var devices: [VampireDevice]
+    let country: CountryPrice
     @State private var deviceToFix: VampireDevice? = nil
     @State private var showPaywall: Bool = false
     @State private var auditPulsing: Bool = false
+
+    init(devices: [VampireDevice] = VampireDevice.defaultDevices, country: CountryPrice = .germany) {
+        _devices = State(initialValue: devices)
+        self.country = country
+    }
 
     // Total yearly cost remaining
     var totalLeaking: Double {
@@ -184,8 +190,14 @@ struct VampireListView: View {
                         ForEach(devices) { device in
                             VampireCardView(device: device) {
                                 triggerTapHaptic()
-                                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                                    deviceToFix = device
+                                if fixedCount == 0 {
+                                    // First FIX is free -> triggers FixAnimationView
+                                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                                        deviceToFix = device
+                                    }
+                                } else {
+                                    // After first FIX, show paywall trigger!
+                                    showPaywall = true
                                 }
                             }
                         }
@@ -279,6 +291,10 @@ struct VampireListView: View {
                                 devices[index].isFixed = true
                             }
                             deviceToFix = nil
+                        }
+                        // After first FIX, show paywall trigger!
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                            showPaywall = true
                         }
                     }
                 )

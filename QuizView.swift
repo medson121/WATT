@@ -108,6 +108,24 @@ struct QuizView: View {
         PriceData.calculateCost(totalWatts: totalWatts, country: selectedCountry)
     }
 
+    // Convert selected appliances to VampireDevice instances with localized yearly costs
+    var selectedVampireDevices: [VampireDevice] {
+        let filtered = appliances.filter { selectedIDs.contains($0.id) }
+        let list = filtered.isEmpty ? appliances : filtered
+        return list.map { app in
+            let cost = PriceData.calculateCost(totalWatts: app.standbyWatts, country: selectedCountry)
+            return VampireDevice(
+                id: UUID(),
+                name: app.name,
+                room: app.category,
+                iconName: app.icon,
+                watts: app.standbyWatts,
+                yearlyCost: cost,
+                isFixed: false
+            )
+        }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -267,10 +285,11 @@ struct QuizView: View {
                 }
             }
             .navigationDestination(isPresented: $navigateToAha) {
-                // Passes totalWatts and selected country to AhaCalculationView
+                // Passes totalWatts, country, and selected vampires to AhaCalculationView
                 AhaCalculationView(
                     totalWatts: totalWatts,
-                    country: selectedCountry
+                    country: selectedCountry,
+                    selectedDevices: selectedVampireDevices
                 )
             }
             .sheet(isPresented: $showCountrySheet) {

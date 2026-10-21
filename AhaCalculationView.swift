@@ -101,6 +101,7 @@ struct ConfettiShowerView: View {
 struct AhaCalculationView: View {
     let totalWatts: Double
     let country: CountryPrice
+    var selectedDevices: [VampireDevice] = []
     var onFixFirstVampire: (() -> Void)? = nil
 
     @State private var navigateToVampireList: Bool = false
@@ -353,7 +354,10 @@ struct AhaCalculationView: View {
             }
         }
         .navigationDestination(isPresented: $navigateToVampireList) {
-            VampireListView()
+            VampireListView(
+                devices: selectedDevices.isEmpty ? VampireDevice.defaultDevices : selectedDevices,
+                country: country
+            )
         }
         .onAppear {
             startAnimationChoreography()
