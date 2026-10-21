@@ -1,0 +1,57 @@
+# codemagic.yaml - Configuração para compilar WATT no Windows usando Mac na nuvem
+# Coloque esse arquivo na raiz do seu projeto WATT (mesma pasta do WATT.xcodeproj)
+
+workflows:
+  ios-workflow:
+    name: WATT iOS Build
+    # Mac Mini M2 - grátis 500 min/mês
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      xcode: latest
+      cocoapods: default
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+    scripts:
+      - name: Set up code signing settings on Xcode project
+        script: |
+          # Bundle ID - TROQUE pelo seu (ex: com.seunome.watt)
+          xcode-project use-profiles
+      - name: Install pods if Podfile exists
+        script: |
+          if [ -f "Podfile" ]; then
+            pod install
+          fi
+      - name: Build iOS app for TestFlight
+        script: |
+          xcode-project build-ipa \
+            --workspace "WATT.xcworkspace" \
+            --scheme "WATT" \
+            --config "Release"
+        # Se não tiver workspace, use:
+        # xcode-project build-ipa --project "WATT.xcodeproj" --scheme "WATT"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      # Envia direto pro TestFlight se você conectar Apple Developer
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        # Descomente quando tiver Apple Developer:
+        # submit_to_testflight: true
+        # beta_groups:
+        #   - Beta Testers
+
+# INSTRUÇÕES WINDOWS -> IPHONE:
+# 1. Crie conta em codemagic.io (login com GitHub, grátis)
+# 2. Conecte seu repositório WATT
+# 3. Em Teams > codemagic.yaml -> Use este arquivo
+# 4. Em Environment variables, adicione suas chaves Apple (quando tiver Developer $99)
+# 5. Clica Start Build -> Em 5 min gera .ipa
+# 6. Baixa e instala via TestFlight ou link direto
