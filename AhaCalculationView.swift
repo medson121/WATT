@@ -3,40 +3,6 @@ import SwiftUI
 import UIKit
 #endif
 
-// MARK: - 1. MODELO DE DADOS: CountryPrice
-struct CountryPrice: Identifiable, Equatable, Hashable {
-    let id: String
-    let name: String
-    let flag: String
-    let currencySymbol: String
-    let pricePerKWh: Double
-
-    static let germany = CountryPrice(
-        id: "DE",
-        name: "Germany",
-        flag: "🇩🇪",
-        currencySymbol: "€",
-        pricePerKWh: 0.3869
-    )
-
-    static let uk = CountryPrice(
-        id: "GB",
-        name: "United Kingdom",
-        flag: "🇬🇧",
-        currencySymbol: "£",
-        pricePerKWh: 0.3400
-    )
-
-    static let france = CountryPrice(
-        id: "FR",
-        name: "France",
-        flag: "🇫🇷",
-        currencySymbol: "€",
-        pricePerKWh: 0.2516
-    )
-
-    static let presets: [CountryPrice] = [.germany, .uk, .france]
-}
 
 // MARK: - Count-Up AnimatableModifier
 struct CountUpModifier: AnimatableModifier {
@@ -138,19 +104,19 @@ struct AhaCalculationView: View {
 
     // MARK: - 2. FÓRMULAS MATEMÁTICAS & CÁLCULOS
     var kwhPerYear: Double {
-        (totalWatts * 18.0 * 365.0) / 1000.0
+        PriceData.calculateKWh(totalWatts: totalWatts)
     }
 
     var eurosPerYear: Double {
-        kwhPerYear * country.pricePerKWh
+        PriceData.calculateCost(totalWatts: totalWatts, country: country)
     }
 
     var co2KgPerYear: Double {
-        kwhPerYear * 0.40
+        PriceData.calculateCO2(totalWatts: totalWatts)
     }
 
     var treesEquivalent: Int {
-        max(1, Int(round(co2KgPerYear / 21.0)))
+        PriceData.calculateTrees(totalWatts: totalWatts)
     }
 
     // Dynamic cognitive anchoring comparison based on cost

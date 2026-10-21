@@ -2,6 +2,8 @@ import SwiftUI
 
 // MARK: - OnboardingView
 struct OnboardingView: View {
+    var onFindVampires: (() -> Void)? = nil
+
     // Animation states for the two floating ghosts
     @State private var ghost1Floating = false
     @State private var ghost2Floating = false
@@ -97,7 +99,7 @@ struct OnboardingView: View {
 
                     // Big Blue Button: "Find my vampires"
                     Button(action: {
-                        // Action for discovering vampire energy drains
+                        onFindVampires?()
                     }) {
                         HStack(spacing: 8) {
                             Text("Find my vampires")
