@@ -21,6 +21,7 @@ struct DashboardView: View {
     @State var streakDays: Int = 5
     @State var vampiresFixed: Int = 3
     @State var totalVampires: Int = 6
+    @State private var companionMood: VampireMood = .happy
     
     var body: some View {
         ZStack {
@@ -50,6 +51,25 @@ struct DashboardView: View {
                     .background(Color.white)
                     .cornerRadius(16)
                     .shadow(color: .black.opacity(0.05), radius: 10, y: 4)
+                    
+                    // Volt - Companheiro de Energia (Tamagotchi / Finch)
+                    VStack(spacing: 2) {
+                        VampireCharacterView(
+                            mood: vampiresFixed == totalVampires ? .fixed : companionMood,
+                            size: 110,
+                            showBubble: true,
+                            onTap: {
+                                withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                                    if companionMood == .happy {
+                                        companionMood = .celebrating
+                                    } else {
+                                        companionMood = .happy
+                                    }
+                                }
+                            }
+                        )
+                    }
+                    .padding(.vertical, 2)
                     
                     // Cards de economia acumulada
                     VStack(spacing: 12) {
