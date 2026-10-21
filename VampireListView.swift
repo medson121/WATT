@@ -81,8 +81,8 @@ struct VampireDevice: Identifiable, Equatable {
 // MARK: - 2. TELA PRINCIPAL: VampireListView
 struct VampireListView: View {
     @StateObject private var viewModel: SavingsViewModel
+    @StateObject var paywall = PaywallManager.shared
     @State private var deviceToFix: VampireDevice? = nil
-    @State private var showPaywall: Bool = false
     @State private var showSupabaseTest: Bool = false
     @State private var auditPulsing: Bool = false
 
@@ -206,16 +206,15 @@ struct VampireListView: View {
                 ScrollView(showsIndicators: false) {
                     LazyVStack(spacing: 14) {
                         ForEach(viewModel.devices) { device in
-                            VampireCardView(device: device) {
+                            let isLocked = !paywall.isPro && (paywall.hasCompletedFirstFix || fixedCount >= 1) && !device.isFixed
+                            VampireCardView(device: device, isLocked: isLocked) {
                                 triggerTapHaptic()
-                                if fixedCount == 0 {
-                                    // First FIX is free -> triggers FixAnimationView
+                                if isLocked {
+                                    paywall.showPaywall = true
+                                } else {
                                     withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                                         deviceToFix = device
                                     }
-                                } else {
-                                    // After first FIX, show paywall trigger!
-                                    showPaywall = true
                                 }
                             }
                         }
@@ -226,14 +225,14 @@ struct VampireListView: View {
                 }
             }
 
-            // MARK: - Gatilho Pro (Após o 1º Fix Grátis)
-            if fixedCount >= 1 && activeCount > 0 {
+            // MARK: - Gatilho Pro (Após o 1º Fix Grátis se não for Pro)
+            if !paywall.isPro && (paywall.hasCompletedFirstFix || fixedCount >= 1) && activeCount > 0 {
                 VStack {
                     Spacer()
 
                     Button(action: {
                         triggerTapHaptic()
-                        showPaywall = true
+                        paywall.showPaywall = true
                     }) {
                         HStack(spacing: 12) {
                             // Crown icon
@@ -305,12 +304,8 @@ struct VampireListView: View {
                     dailySavingsFormatted: device.dailySavingsFormatted,
                     onComplete: {
                         viewModel.fixVampire(device)
+                        paywall.completeFirstFix()
                         deviceToFix = nil
-
-                        // After first FIX, show paywall trigger!
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                            showPaywall = true
-                        }
                     }
                 )
                 .transition(.opacity.combined(with: .scale(scale: 0.95)))
@@ -322,7 +317,7 @@ struct VampireListView: View {
                 auditPulsing = true
             }
         }
-        .sheet(isPresented: $showPaywall) {
+        .sheet(isPresented: $paywall.showPaywall) {
             PaywallView()
         }
         .sheet(isPresented: $showSupabaseTest) {
@@ -342,6 +337,7 @@ struct VampireListView: View {
 // MARK: - Vampire Card in Glassmorphism
 struct VampireCardView: View {
     let device: VampireDevice
+    var isLocked: Bool = false
     let onFix: () -> Void
 
     var body: some View {
@@ -354,7 +350,7 @@ struct VampireCardView: View {
 
                 Image(systemName: device.isFixed ? "checkmark.circle.fill" : device.iconName)
                     .font(.system(size: 22, weight: .bold))
-                    .foregroundColor(device.isFixed ? Color(hex: "10B981") : Color(hex: "0F2235"))
+                    .foregroundColor(device.isFixed ? Color(hex: "10B981") : (isLocked ? Color(hex: "9CA3AF") : Color(hex: "0F2235")))
             }
 
             // Info Column
@@ -362,7 +358,7 @@ struct VampireCardView: View {
                 HStack(spacing: 6) {
                     Text(device.name)
                         .font(.system(size: 15, weight: .bold, design: .rounded))
-                        .foregroundColor(Color(hex: "0F2235"))
+                        .foregroundColor(isLocked ? Color(hex: "0F2235").opacity(0.65) : Color(hex: "0F2235"))
 
                     Text(device.room)
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
@@ -376,15 +372,15 @@ struct VampireCardView: View {
                     // Consumption tag in Watts
                     Text(String(format: "%.1fW", device.watts))
                         .font(.system(size: 11, weight: .heavy, design: .rounded))
-                        .foregroundColor(Color(hex: "D97706"))
+                        .foregroundColor(isLocked ? Color(hex: "9CA3AF") : Color(hex: "D97706"))
                         .padding(.horizontal, 7)
                         .padding(.vertical, 3)
-                        .background(Capsule().fill(Color(hex: "FEF3C7")))
+                        .background(Capsule().fill(isLocked ? Color(hex: "F3F4F6") : Color(hex: "FEF3C7")))
 
                     // Annual cost
                     Text("€\(String(format: "%.2f", device.yearlyCost))/year")
                         .font(.system(size: 13, weight: .bold, design: .rounded))
-                        .foregroundColor(device.isFixed ? Color(hex: "10B981") : Color(hex: "0F2235").opacity(0.85))
+                        .foregroundColor(device.isFixed ? Color(hex: "10B981") : Color(hex: "0F2235").opacity(isLocked ? 0.5 : 0.85))
                 }
             }
 
@@ -412,8 +408,29 @@ struct VampireCardView: View {
                         .font(.system(size: 9.5, weight: .semibold, design: .rounded))
                         .foregroundColor(Color(hex: "059669").opacity(0.85))
                 }
+            } else if isLocked {
+                // Locked State with Lock Icon
+                Button(action: onFix) {
+                    HStack(spacing: 5) {
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 12, weight: .bold))
+                        Text("FIX")
+                            .font(.system(size: 13, weight: .heavy, design: .rounded))
+                    }
+                    .foregroundColor(Color(hex: "4B5563"))
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(Color(hex: "E5E7EB"))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(Color(hex: "D1D5DB"), lineWidth: 1)
+                    )
+                }
             } else {
-                // FIX Button
+                // Active FIX Button
                 Button(action: onFix) {
                     Text("FIX")
                         .font(.system(size: 14, weight: .heavy, design: .rounded))
@@ -435,11 +452,11 @@ struct VampireCardView: View {
         .padding(14)
         .background(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(device.isFixed ? Color(hex: "ECFDF5").opacity(0.95) : Color.white.opacity(0.85))
+                .fill(device.isFixed ? Color(hex: "ECFDF5").opacity(0.95) : (isLocked ? Color.white.opacity(0.65) : Color.white.opacity(0.85)))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(device.isFixed ? Color(hex: "A7F3D0") : Color.white, lineWidth: 1.5)
+                .stroke(device.isFixed ? Color(hex: "A7F3D0") : (isLocked ? Color(hex: "E5E7EB") : Color.white), lineWidth: 1.5)
         )
         .shadow(color: Color(hex: "0F2235").opacity(0.05), radius: 12, x: 0, y: 6)
         .animation(.spring(response: 0.45, dampingFraction: 0.75), value: device.isFixed)

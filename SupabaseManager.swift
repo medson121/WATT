@@ -6,24 +6,24 @@ import SwiftUI
 
 // MARK: - Modelo simples (sem SDK externo, usa URLSession - funciona 100% no Windows)
 
-class SupabaseManager: ObservableObject {
-    static let shared = SupabaseManager()
+public class SupabaseManager: ObservableObject {
+    public static let shared = SupabaseManager()
     
     // Configurações do Supabase fornecidas
-    @Published private(set) var supabaseURL = "https://qjzdkmyxxhocyqvwqmbi.supabase.co/rest/v1/"
-    @Published private(set) var supabaseAnonKey = "sb_publishable_9mpwzt_DM90N73wBsD-XEw_PVyVbzuP"
+    @Published public private(set) var supabaseURL = "https://qjzdkmyxxhocyqvwqmbi.supabase.co/rest/v1/"
+    @Published public private(set) var supabaseAnonKey = "sb_publishable_9mpwzt_DM90N73wBsD-XEw_PVyVbzuP"
     
-    @Published var isConnected = false
-    @Published var isTesting = false
-    @Published var lastError: String?
-    @Published var lastResponse: String?
-    @Published var lastStatusCode: Int?
-    @Published var lastLatencyMs: Int?
-    @Published var lastTestedAt: Date?
-    @Published var fetchedCountries: [CountryPrice] = []
+    @Published public var isConnected = false
+    @Published public var isTesting = false
+    @Published public var lastError: String?
+    @Published public var lastResponse: String?
+    @Published public var lastStatusCode: Int?
+    @Published public var lastLatencyMs: Int?
+    @Published public var lastTestedAt: Date?
+    @Published public var fetchedCountries: [CountryPrice] = []
 
     /// Base REST endpoint URL helper to prevent double slashes or missing /rest/v1
-    var restBaseURL: String {
+    public var restBaseURL: String {
         var trimmed = supabaseURL.trimmingCharacters(in: .whitespacesAndNewlines)
         while trimmed.hasSuffix("/") {
             trimmed.removeLast()
@@ -35,15 +35,17 @@ class SupabaseManager: ObservableObject {
         }
     }
 
+    public init() {}
+
     // Permite reconfigurar dinamicamente se necessário
-    func configure(url: String, anonKey: String) {
+    public func configure(url: String, anonKey: String) {
         self.supabaseURL = url.trimmingCharacters(in: .whitespacesAndNewlines)
         self.supabaseAnonKey = anonKey.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     // MARK: - Testar conexão com countries_prices (que você já criou)
     @discardableResult
-    func testConnection() async -> Bool {
+    public func testConnection() async -> Bool {
         await MainActor.run {
             self.isTesting = true
             self.lastError = nil
@@ -110,7 +112,7 @@ class SupabaseManager: ObservableObject {
     }
     
     // MARK: - Salvar vampiro do usuário
-    func saveUserVampire(catalogId: String, customWatts: Double?, room: String) async {
+    public func saveUserVampire(catalogId: String, customWatts: Double?, room: String) async {
         let urlString = "\(restBaseURL)/user_vampires"
         guard let url = URL(string: urlString) else { return }
         
@@ -141,7 +143,7 @@ class SupabaseManager: ObservableObject {
     }
     
     // MARK: - Salvar check diário (quando fixa)
-    func saveDailyCheck(eurosSaved: Double, kwhSaved: Double, co2Saved: Double, vampiresFixed: Int) async {
+    public func saveDailyCheck(eurosSaved: Double, kwhSaved: Double, co2Saved: Double, vampiresFixed: Int) async {
         let urlString = "\(restBaseURL)/daily_checks"
         guard let url = URL(string: urlString) else { return }
         
@@ -174,7 +176,7 @@ class SupabaseManager: ObservableObject {
     }
     
     // MARK: - Buscar países (do banco que você criou na Parte 1)
-    func fetchCountries() async -> [CountryPrice] {
+    public func fetchCountries() async -> [CountryPrice] {
         let urlString = "\(restBaseURL)/countries_prices?select=*"
         guard let url = URL(string: urlString) else { return CountryPrice.all }
         
