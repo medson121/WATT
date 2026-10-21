@@ -10,6 +10,8 @@
 		1A0000202A00002000000020 /* WATTApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000102A00001000000010 /* WATTApp.swift */; };
 		1A0000212A00002100000021 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000112A00001100000011 /* ContentView.swift */; };
 		1A0000222A00002200000022 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000122A00001200000012 /* OnboardingView.swift */; };
+		1A0000242A00002400000024 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000142A00001400000014 /* Color+Hex.swift */; };
+		1A0000252A00002500000025 /* AhaCalculationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000152A00001500000015 /* AhaCalculationView.swift */; };
 		1A0000232A00002300000023 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A0000132A00001300000013 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -18,6 +20,8 @@
 		1A0000102A00001000000010 /* WATTApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WATTApp.swift; sourceTree = "<group>"; };
 		1A0000112A00001100000011 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		1A0000122A00001200000012 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		1A0000142A00001400000014 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
+		1A0000152A00001500000015 /* AhaCalculationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AhaCalculationView.swift; sourceTree = "<group>"; };
 		1A0000132A00001300000013 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -38,6 +42,8 @@
 				1A0000102A00001000000010 /* WATTApp.swift */,
 				1A0000112A00001100000011 /* ContentView.swift */,
 				1A0000122A00001200000012 /* OnboardingView.swift */,
+				1A0000142A00001400000014 /* Color+Hex.swift */,
+				1A0000152A00001500000015 /* AhaCalculationView.swift */,
 				1A0000132A00001300000013 /* Assets.xcassets */,
 				1A0000042A00000400000004 /* WATT.app */,
 			);
@@ -115,6 +121,8 @@
 				1A0000202A00002000000020 /* WATTApp.swift in Sources */,
 				1A0000212A00002100000021 /* ContentView.swift in Sources */,
 				1A0000222A00002200000022 /* OnboardingView.swift in Sources */,
+				1A0000242A00002400000024 /* Color+Hex.swift in Sources */,
+				1A0000252A00002500000025 /* AhaCalculationView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
