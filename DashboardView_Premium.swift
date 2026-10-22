@@ -465,9 +465,6 @@ public struct PremiumMetricCard: View {
     }
 }
 
-// Typealias de conveniência para PaywallView_Premium
-public typealias PaywallView_Premium = PaywallView
-
 #Preview {
     DashboardView_Premium()
 }

@@ -33,6 +33,7 @@ class PaywallManager: ObservableObject {
     @Published var showPaywall = false
     @Published var selectedTab: AppTab = .home
     @Published var navigateToDashboard: Bool = false
+    @Published var isPurchasing: Bool = false
     
     // Preços - GDPR friendly, mostra em euro
     struct Plan: Identifiable {
@@ -115,6 +116,8 @@ class PaywallManager: ObservableObject {
     // MARK: - Compra Segura
     func purchase() async -> Bool {
         AppLogger.info("Iniciando compra segura do plano: \(selectedPlan.name)")
+        self.isPurchasing = true
+        defer { self.isPurchasing = false }
         
         #if canImport(StoreKit)
         // Quando configurado com StoreKit 2 / App Store Connect real:

@@ -29,6 +29,7 @@
 		1A0000852A00008500000085 /* PrivacySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000752A00007500000075 /* PrivacySettingsView.swift */; };
 		1A0000862A00008600000086 /* VampireCharacterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000762A00007600000076 /* VampireCharacterView.swift */; };
 		1A0000872A00008700000087 /* DashboardView_Premium.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000772A00007700000077 /* DashboardView_Premium.swift */; };
+		1A0000882A00008800000088 /* PaywallView_Premium.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000782A00007800000078 /* PaywallView_Premium.swift */; };
 		1A0000832A00008300000083 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1A0000732A00007300000073 /* PrivacyInfo.xcprivacy */; };
 		1A0000232A00002300000023 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A0000132A00001300000013 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
@@ -57,6 +58,7 @@
 		1A0000752A00007500000075 /* PrivacySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacySettingsView.swift; sourceTree = "<group>"; };
 		1A0000762A00007600000076 /* VampireCharacterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VampireCharacterView.swift; sourceTree = "<group>"; };
 		1A0000772A00007700000077 /* DashboardView_Premium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView_Premium.swift; sourceTree = "<group>"; };
+		1A0000782A00007800000078 /* PaywallView_Premium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView_Premium.swift; sourceTree = "<group>"; };
 		1A0000732A00007300000073 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		1A0000132A00001300000013 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -97,6 +99,7 @@
 				1A0000752A00007500000075 /* PrivacySettingsView.swift */,
 				1A0000762A00007600000076 /* VampireCharacterView.swift */,
 				1A0000772A00007700000077 /* DashboardView_Premium.swift */,
+				1A0000782A00007800000078 /* PaywallView_Premium.swift */,
 				1A0000732A00007300000073 /* PrivacyInfo.xcprivacy */,
 				1A0000132A00001300000013 /* Assets.xcassets */,
 				1A0000042A00000400000004 /* WATT.app */,
@@ -195,6 +198,7 @@
 				1A0000852A00008500000085 /* PrivacySettingsView.swift in Sources */,
 				1A0000862A00008600000086 /* VampireCharacterView.swift in Sources */,
 				1A0000872A00008700000087 /* DashboardView_Premium.swift in Sources */,
+				1A0000882A00008800000088 /* PaywallView_Premium.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
