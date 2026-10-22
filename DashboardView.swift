@@ -29,47 +29,53 @@ struct DashboardView: View {
             
             ScrollView {
                 VStack(spacing: 24) {
-                    // Header - Streak
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text("🔥 \(streakDays) day streak!")
-                                .font(.headline.bold())
-                                .foregroundColor(Color(hex: "#0F2235"))
-                            Text("Keep fixing to grow your forest")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                        Spacer()
-                        // Floresta visual
-                        HStack(spacing: -6) {
-                            ForEach(0..<min(streakDays, 7), id: \.self) { _ in
-                                Text("🌳").font(.title3)
+                    // Header Companion Card - Volt com floresta crescendo atrás baseada no streak
+                    ZStack {
+                        // Floresta crescendo atrás do Volt
+                        HStack(spacing: -14) {
+                            ForEach(0..<max(1, min(streakDays, 7)), id: \.self) { i in
+                                Text("🌳")
+                                    .font(.system(size: 36))
+                                    .offset(y: i % 2 == 0 ? -16 : -8)
+                                    .opacity(0.88)
+                                    .scaleEffect(1.0 + CGFloat(i) * 0.04)
+                                    .animation(.spring(response: 0.5, dampingFraction: 0.6).delay(Double(i) * 0.08), value: streakDays)
                             }
                         }
-                    }
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(16)
-                    .shadow(color: .black.opacity(0.05), radius: 10, y: 4)
-                    
-                    // Volt - Companheiro de Energia (Tamagotchi / Finch)
-                    VStack(spacing: 2) {
-                        VampireCharacterView(
-                            mood: vampiresFixed == totalVampires ? .fixed : companionMood,
-                            size: 110,
-                            showBubble: true,
-                            onTap: {
-                                withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
-                                    if companionMood == .happy {
-                                        companionMood = .celebrating
-                                    } else {
-                                        companionMood = .happy
-                                    }
-                                }
+                        .offset(y: -24)
+                        
+                        // Volt Companion
+                        VStack(spacing: 8) {
+                            VampireCharacterView(
+                                mood: streakDays > 3 ? .happy : .idle,
+                                size: 100,
+                                showBubble: true
+                            )
+                            
+                            // Streak pill
+                            HStack(spacing: 6) {
+                                Text("🔥 \(streakDays) day streak!")
+                                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                                    .foregroundColor(Color(hex: "#0F2235"))
+                                
+                                Text("•")
+                                    .foregroundColor(.gray)
+                                
+                                Text("\(streakDays) trees planted")
+                                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                                    .foregroundColor(Color(hex: "#10B981"))
                             }
-                        )
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(Color.white)
+                                    .shadow(color: Color.black.opacity(0.04), radius: 6, y: 2)
+                            )
+                        }
                     }
-                    .padding(.vertical, 2)
+                    .padding(.top, 12)
+                    .padding(.bottom, 6)
                     
                     // Cards de economia acumulada
                     VStack(spacing: 12) {

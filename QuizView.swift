@@ -176,12 +176,17 @@ struct QuizView: View {
                             Text("Tap each appliance you leave plugged in on standby.")
                                 .font(.system(size: 14, weight: .medium, design: .rounded))
                                 .foregroundColor(Color(hex: "0F2235").opacity(0.65))
-                                .multilineTextAlignment(.center)
-                        }
+                        // Volt Companion em modo .sleepy (Zzz na tomada)
+                        VampireCharacterView(
+                            mood: .sleepy,
+                            size: 72,
+                            showBubble: true
+                        )
+                        .padding(.top, 2)
                     }
                     .padding(.horizontal, 20)
-                    .padding(.top, 14)
-                    .padding(.bottom, 12)
+                    .padding(.top, 10)
+                    .padding(.bottom, 8)
 
                     // MARK: - Appliance Grid
                     ScrollView(showsIndicators: false) {

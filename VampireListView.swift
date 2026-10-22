@@ -342,16 +342,15 @@ struct VampireCardView: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            // Icon Container (52x52pt)
+            // Icon Container - Volt Companion
             ZStack {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(device.isFixed ? Color(hex: "D1FAE5") : Color(hex: "F3F4F6"))
-                    .frame(width: 52, height: 52)
-
-                Image(systemName: device.isFixed ? "checkmark.circle.fill" : device.iconName)
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundColor(device.isFixed ? Color(hex: "10B981") : (isLocked ? Color(hex: "9CA3AF") : Color(hex: "0F2235")))
+                VampireCharacterView(
+                    mood: device.isFixed ? .fixed : .leaking,
+                    size: 48,
+                    showBubble: false
+                )
             }
+            .frame(width: 54, height: 54)
 
             // Info Column
             VStack(alignment: .leading, spacing: 4) {

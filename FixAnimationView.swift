@@ -52,8 +52,8 @@ struct FixAnimationView: View {
     @State private var wrenchRotation: Double = 0.0
     @State private var wrenchOpacity: Double = 0.0
 
-    // Ghost states
-    @State private var ghostEmoji: String = "👻"
+    // Ghost / Volt Companion states
+    @State private var voltMood: VampireMood = .leaking
     @State private var ghostScale: CGFloat = 1.0
     @State private var ghostOpacity: Double = 1.0
     @State private var ghostOffsetY: CGFloat = 0.0
@@ -168,14 +168,15 @@ struct FixAnimationView: View {
                         .animation(.easeInOut(duration: 0.35).repeatForever(autoreverses: true), value: lightningPulsing)
                     }
 
-                    // The Floating Ghost
-                    Text(ghostEmoji)
-                        .font(.system(size: 48))
-                        .offset(x: 74, y: -24 + ghostOffsetY)
-                        .scaleEffect(ghostScale)
-                        .opacity(ghostOpacity)
-                        .modifier(ShakeEffect(animatableData: shakeProgress))
-                        .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
+                    // The Volt Companion Character
+                    VampireCharacterView(
+                        mood: voltMood,
+                        size: 80,
+                        showBubble: phase == 3
+                    )
+                    .offset(x: 55, y: -25 + ghostOffsetY)
+                    .scaleEffect(ghostScale)
+                    .modifier(ShakeEffect(animatableData: shakeProgress))
 
                     // Spinning Wrench (Phase 2)
                     Image(systemName: "wrench.and.screwdriver.fill")
@@ -306,7 +307,7 @@ struct FixAnimationView: View {
     private func startFixSequence() {
         // === FASE 1: SUSTO (Ghost gets shocked and shakes) ===
         phase = 1
-        ghostEmoji = "😱"
+        voltMood = .guilty
         lightningPulsing = false
 
         withAnimation(.easeInOut(duration: 0.5)) {
@@ -337,10 +338,11 @@ struct FixAnimationView: View {
             // Double haptic feedback
             triggerDoubleHaptic()
 
-            // 1. Outlet becomes happy with wide smile
+            // 1. Outlet becomes happy and Volt celebrates with particles
             withAnimation(.spring(response: 0.4, dampingFraction: 0.65)) {
                 isOutletHappy = true
                 cardScale = 1.0
+                voltMood = .celebrating
             }
 
             // 2. Hide wrench smoothly
@@ -349,22 +351,22 @@ struct FixAnimationView: View {
                 wrenchOpacity = 0.0
             }
 
-            // 3. Dissipate ghost
-            withAnimation(.easeOut(duration: 0.45)) {
-                ghostScale = 1.6
-                ghostOpacity = 0.0
-                ghostOffsetY = -40
-            }
-
-            // 4. Launch golden coin upwards with bounce spring
+            // 3. Launch golden coin upwards with bounce spring
             withAnimation(.spring(response: 0.6, dampingFraction: 0.65)) {
                 coinScale = 1.15
                 coinOffsetY = -95
                 coinOpacity = 1.0
             }
 
-            // 5. Explode 360° particles
+            // 4. Explode 360° particles
             particlesExploded = true
+
+            // 5. Transform Volt into fixed guardian (folha 🌿)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                    voltMood = .fixed
+                }
+            }
         }
     }
 
