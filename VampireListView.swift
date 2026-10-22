@@ -294,17 +294,16 @@ struct VampireListView: View {
                 }
             }
 
-            // MARK: - 3. FixAnimationView Overlay
+            // MARK: - 3. FixAnimationView_Premium Overlay (TikTok Viral Animation)
             if let device = deviceToFix {
-                FixAnimationView(
-                    deviceName: device.name,
-                    room: device.room,
-                    watts: device.watts,
-                    yearlyCost: device.yearlyCost,
-                    dailySavingsFormatted: device.dailySavingsFormatted,
-                    onComplete: {
+                FixAnimationView_Premium(
+                    vampire: VampireItem(device: device),
+                    onFixed: {
                         viewModel.fixVampire(device)
                         paywall.completeFirstFix()
+                        deviceToFix = nil
+                    },
+                    onClose: {
                         deviceToFix = nil
                     }
                 )
