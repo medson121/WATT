@@ -597,7 +597,14 @@ struct ProFeatureRow: View {
     }
 }
 
-// MARK: - SwiftUI Preview
-#Preview("VampireListView") {
+// MARK: - SwiftUI Previews (390px & 430px checks)
+#Preview("VampireList - 390px") {
     VampireListView()
+        .frame(width: 390, height: 844)
 }
+
+#Preview("VampireList - 430px") {
+    VampireListView()
+        .frame(width: 430, height: 932)
+}
+
